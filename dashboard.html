@@ -1327,14 +1327,14 @@
       localStorage.removeItem('instructionData');
       localStorage.removeItem('fileDataStore');
       localStorage.removeItem('userLoggedIn');
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     });
 
     // ======================== Initialize ========================
     window.addEventListener('load', () => {
       const userLoggedIn = localStorage.getItem('userLoggedIn');
       if (!userLoggedIn) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
       }
 
