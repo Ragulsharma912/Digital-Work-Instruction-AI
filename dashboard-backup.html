@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Work Instruction AI - Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --accent: #4f46e5;
+      --accent-2: #7c3aed;
+      --border: #374151;
+      --error: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #1e293b);
+      color: var(--text);
+    }
+
+    header {
+      background: rgba(17, 24, 39, 0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .logout-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: var(--error);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .logout-btn:hover {
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-container {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      margin: 0 0 20px;
+      color: var(--text);
+    }
+
+    .row-container {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .row-number {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .delete-btn, .remove-file-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: var(--error);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .delete-btn:hover, .remove-file-btn:hover {
+      opacity: 0.8;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+    }
+
+    .file-display {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .file-name {
+      color: var(--success);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .add-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .add-btn:hover {
+      opacity: 0.9;
+    }
+
+    .submit-btn {
+      padding: 12px 32px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--success), #16a34a);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.9;
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--error);
+      border: 1px solid var(--error);
+    }
+
+    .message.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .viewer-container {
+      display: grid;
+      gap: 20px;
+    }
+
+    .file-item {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .file-info {
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+
+    .file-label {
+      color: var(--muted);
+      font-weight: 600;
+      display: inline-block;
+      width: 120px;
+    }
+
+    .viewer-play-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .viewer-play-btn:hover {
+      opacity: 0.9;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    /* Full Screen Viewer */
+    .fullscreen-viewer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .fullscreen-viewer.active {
+      display: flex;
+    }
+
+    .fullscreen-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .fullscreen-content img, 
+    .fullscreen-content video, 
+    .fullscreen-content iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .fullscreen-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      z-index: 10;
+    }
+
+    .fullscreen-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    .exit-timer {
+      color: var(--warning);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .fullscreen-exit-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: var(--error);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .fullscreen-exit-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Password Modal */
+    .password-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .password-modal.active {
+      display: flex;
+    }
+
+    .password-modal-content {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+    }
+
+    .password-modal-content h2 {
+      margin: 0 0 20px;
+      color: var(--text);
+    }
+
+    .password-input-group {
+      margin-bottom: 20px;
+    }
+
+    .password-input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .password-input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .password-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .password-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .password-confirm {
+      background: var(--success);
+      color: white;
+    }
+
+    .password-confirm:hover {
+      opacity: 0.9;
+    }
+
+    .password-cancel {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .password-cancel:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .form-row, .form-row-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="header-title">🤖 Digital Work Instruction AI</h1>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="editor">Editor</button>
+      <button class="tab-btn" data-tab="viewer">Viewer</button>
+    </div>
+
+    <!-- Editor Tab -->
+    <div id="editor" class="tab-content active">
+      <div class="form-container">
+        <h2 class="form-title">📝 Upload & Configure Files</h2>
+        
+        <form id="editorForm">
+          <div id="rowsContainer"></div>
+
+          <div class="button-group">
+            <button type="button" class="add-btn" id="addRowBtn">+ Add New Row</button>
+            <button type="submit" class="submit-btn">✓ Save Configuration</button>
+          </div>
+
+          <div id="editorMessage" class="message" style="display: none;"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Viewer Tab -->
+    <div id="viewer" class="tab-content">
+      <div class="form-container">
+        <h2 class="form-title">👁️ File Viewer</h2>
+        <p style="color: var(--muted); margin: 0 0 20px;">Click "Start Playback" to begin full-screen playback based on scheduled times</p>
+        <div id="viewerContainer" class="viewer-container">
+          <div class="empty-state">
+            <div class="empty-state-icon">📂</div>
+            <p>No files uploaded yet. Go to the Editor tab to upload files.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Screen Viewer -->
+  <div id="fullscreenViewer" class="fullscreen-viewer">
+    <div class="fullscreen-info" id="fullscreenInfo"></div>
+    <div class="fullscreen-content" id="fullscreenContent"></div>
+    <div class="fullscreen-controls">
+      <div class="exit-timer" id="exitTimer"></div>
+      <button class="fullscreen-exit-btn" id="fullscreenExitBtn">Exit (Password Required)</button>
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div id="passwordModal" class="password-modal">
+    <div class="password-modal-content">
+      <h2>⚠️ Confirm Exit</h2>
+      <p style="color: var(--muted); margin-bottom: 20px;">Enter password to exit viewer</p>
+      <div class="password-input-group">
+        <input type="password" id="passwordInput" placeholder="Enter password" />
+      </div>
+      <div class="password-buttons">
+        <button class="password-btn password-confirm" id="passwordConfirmBtn">Confirm</button>
+        <button class="password-btn password-cancel" id="passwordCancelBtn">Cancel</button>
+      </div>
+      <div id="passwordMessage" class="message" style="display: none; margin-top: 15px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // ======================== Configuration ========================
+    const VIEWER_PASSWORD = "admin123";
+    let rowCount = 0;
+    let exitCountdown = 5;
+    let exitCountdownInterval = null;
+    let playbackSchedule = [];
+    let currentPlayingIndex = 0;
+
+    // ======================== Tab Navigation ========================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(tab).classList.add('active');
+      });
+    });
+
+    // ======================== Editor Functionality ========================
+    const rowsContainer = document.getElementById('rowsContainer');
+    const addRowBtn = document.getElementById('addRowBtn');
+    const editorForm = document.getElementById('editorForm');
+    const editorMessage = document.getElementById('editorMessage');
+
+    function createRow(rowNumber) {
+      const rowId = `row-${rowNumber}`;
+      const row = document.createElement('div');
+      row.className = 'row-container';
+      row.id = rowId;
+      row.innerHTML = `
+        <div class="row-header">
+          <span class="row-number">Row ${rowNumber}</span>
+          <button type="button" class="delete-btn" onclick="deleteRow('${rowId}')">Delete Row</button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>File Upload</label>
+            <input type="file" class="file-input" accept="image/*,video/*,.pdf" />
+            <div class="file-display" style="display: none;">
+              <span class="file-name"></span>
+              <button type="button" class="remove-file-btn" onclick="removeFile('${rowId}')" style="padding: 4px 12px; font-size: 0.85rem;">Remove</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>File Type</label>
+            <select class="file-type-select" required>
+              <option value="">Select Type</option>
+              <option value="photo">Photo</option>
+              <option value="video">Video</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Start Time (HH:MM:SS)</label>
+            <input type="text" class="start-time" placeholder="00:00:00" pattern="[0-2][0-9]:[0-5][0-9]:[0-5][0-9]" required />
+          </div>
+          <div class="form-group">
+            <label>End Time (HH:MM:SS)</label>
+            <input type="text" class="end-time" placeholder="00:00:10" pattern="[0-2][0-9]:[0-5][0-9]:[0-5][0-9]" required />
+          </div>
+          <div class="form-group">
+            <label>Number of Loops</label>
+            <input type="number" class="loops" min="1" max="100" value="1" required />
+          </div>
+        </div>
+      `;
+
+      const fileInput = row.querySelector('.file-input');
+      fileInput.addEventListener('change', () => {
+        const fileDisplay = row.querySelector('.file-display');
+        if (fileInput.files.length > 0) {
+          row.querySelector('.file-name').textContent = `📄 ${fileInput.files[0].name}`;
+          fileDisplay.style.display = 'flex';
+        } else {
+          fileDisplay.style.display = 'none';
+        }
+      });
+
+      rowsContainer.appendChild(row);
+    }
+
+    function deleteRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.remove();
+      }
+    }
+
+    function removeFile(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        const fileInput = row.querySelector('.file-input');
+        const fileDisplay = row.querySelector('.file-display');
+        fileInput.value = '';
+        fileDisplay.style.display = 'none';
+      }
+    }
+
+    addRowBtn.addEventListener('click', () => {
+      rowCount++;
+      createRow(rowCount);
+    });
+
+    editorForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const rows = document.querySelectorAll('.row-container');
+      if (rows.length === 0) {
+        showMessage('editorMessage', 'Please add at least one row.', 'error');
+        return;
+      }
+
+      const data = [];
+      let isValid = true;
+
+      rows.forEach((row, index) => {
+        const fileInput = row.querySelector('.file-input');
+        const fileTypeSelect = row.querySelector('.file-type-select');
+        const startTime = row.querySelector('.start-time').value;
+        const endTime = row.querySelector('.end-time').value;
+        const loops = row.querySelector('.loops').value;
+
+        if (!fileInput.files.length) {
+          isValid = false;
+          showMessage('editorMessage', 'Please select a file for all rows.', 'error');
+          return;
+        }
+
+        if (!fileTypeSelect.value) {
+          isValid = false;
+          showMessage('editorMessage', 'Please select a file type for all rows.', 'error');
+          return;
+        }
+
+        if (!startTime || !endTime || !loops) {
+          isValid = false;
+          showMessage('editorMessage', 'Please fill in all time and loop fields.', 'error');
+          return;
+        }
+
+        if (timeToSeconds(startTime) >= timeToSeconds(endTime)) {
+          isValid = false;
+          showMessage('editorMessage', 'Start time must be before end time.', 'error');
+          return;
+        }
+
+        data.push({
+          file: fileInput.files[0].name,
+          fileType: fileTypeSelect.value,
+          startTime: startTime,
+          endTime: endTime,
+          loops: parseInt(loops),
+          fileData: fileInput.files[0],
+          startSeconds: timeToSeconds(startTime),
+          endSeconds: timeToSeconds(endTime)
+        });
+      });
+
+      if (isValid) {
+        localStorage.setItem('instructionData', JSON.stringify(data.map(d => ({
+          file: d.file,
+          fileType: d.fileType,
+          startTime: d.startTime,
+          endTime: d.endTime,
+          loops: d.loops,
+          startSeconds: d.startSeconds,
+          endSeconds: d.endSeconds
+        }))));
+        
+        data.forEach((item, index) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const fileData = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : {};
+            fileData[index] = {
+              data: e.target.result,
+              type: item.fileType,
+              name: item.file
+            };
+            localStorage.setItem('fileData', JSON.stringify(fileData));
+          };
+          reader.readAsDataURL(item.fileData);
+        });
+
+        showMessage('editorMessage', '✓ Configuration saved successfully!', 'success');
+        setTimeout(() => {
+          editorMessage.style.display = 'none';
+          loadViewerData();
+        }, 2000);
+      }
+    });
+
+    function showMessage(elementId, text, type) {
+      const messageEl = document.getElementById(elementId);
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+      messageEl.style.display = 'block';
+    }
+
+    // ======================== Viewer Functionality ========================
+    function loadViewerData() {
+      const viewerContainer = document.getElementById('viewerContainer');
+      const instructionData = localStorage.getItem('instructionData') ? JSON.parse(localStorage.getItem('instructionData')) : [];
+
+      if (instructionData.length === 0) {
+        viewerContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📂</div>
+            <p>No files uploaded yet. Go to the Editor tab to upload files.</p>
+          </div>
+        `;
+        return;
+      }
+
+      viewerContainer.innerHTML = '';
+
+      instructionData.forEach((item, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <div><span class="file-label">File:</span> ${item.file}</div>
+            <div><span class="file-label">Type:</span> ${item.fileType.toUpperCase()}</div>
+            <div><span class="file-label">Playback Time:</span> ${item.startTime} → ${item.endTime}</div>
+            <div><span class="file-label">Loops:</span> ${item.loops}x</div>
+          </div>
+          <button class="viewer-play-btn" style="margin-top: 15px; width: 100%;" onclick="startPlayback()">
+            ▶ Start Scheduled Playback
+          </button>
+        `;
+
+        viewerContainer.appendChild(fileItem);
+      });
+    }
+
+    function startPlayback() {
+      const instructionData = localStorage.getItem('instructionData') ? JSON.parse(localStorage.getItem('instructionData')) : [];
+      if (instructionData.length === 0) return;
+
+      playbackSchedule = instructionData.sort((a, b) => a.startSeconds - b.startSeconds);
+      playScheduledContent();
+    }
+
+    function playScheduledContent() {
+      if (currentPlayingIndex >= playbackSchedule.length) {
+        currentPlayingIndex = 0;
+        alert("All files have been played!");
+        return;
+      }
+
+      const item = playbackSchedule[currentPlayingIndex];
+      const fileData = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : {};
+      const data = fileData[playbackSchedule.findIndex(f => f.file === item.file)];
+
+      if (!data) {
+        currentPlayingIndex++;
+        playScheduledContent();
+        return;
+      }
+
+      document.getElementById('fullscreenViewer').classList.add('active');
+      document.getElementById('fullscreenInfo').textContent = `${item.file} | ${item.startTime} - ${item.endTime} (Loop: 1/${item.loops})`;
+
+      const contentDiv = document.getElementById('fullscreenContent');
+      contentDiv.innerHTML = '';
+
+      switch (data.type) {
+        case 'photo':
+          const img = document.createElement('img');
+          img.src = data.data;
+          contentDiv.appendChild(img);
+          break;
+        case 'video':
+          const video = document.createElement('video');
+          video.src = data.data;
+          video.controls = true;
+          video.autoplay = true;
+          contentDiv.appendChild(video);
+          break;
+        case 'pdf':
+          const iframe = document.createElement('iframe');
+          iframe.src = data.data;
+          iframe.style.border = 'none';
+          contentDiv.appendChild(iframe);
+          break;
+      }
+
+      exitCountdown = 5;
+      startExitCountdown();
+    }
+
+    function startExitCountdown() {
+      const exitTimerEl = document.getElementById('exitTimer');
+      exitTimerEl.textContent = `Exit available in: ${exitCountdown}s`;
+
+      if (exitCountdownInterval) clearInterval(exitCountdownInterval);
+
+      exitCountdownInterval = setInterval(() => {
+        exitCountdown--;
+        exitTimerEl.textContent = `Exit available in: ${exitCountdown}s`;
+
+        if (exitCountdown <= 0) {
+          clearInterval(exitCountdownInterval);
+        }
+      }, 1000);
+    }
+
+    document.getElementById('fullscreenExitBtn').addEventListener('click', () => {
+      if (exitCountdown > 0) {
+        alert('Please wait ' + exitCountdown + ' more second(s) before exiting');
+        return;
+      }
+      document.getElementById('passwordModal').classList.add('active');
+    });
+
+    document.getElementById('passwordConfirmBtn').addEventListener('click', () => {
+      const password = document.getElementById('passwordInput').value;
+      const passwordMessage = document.getElementById('passwordMessage');
+
+      if (password === VIEWER_PASSWORD) {
+        document.getElementById('passwordModal').classList.remove('active');
+        document.getElementById('fullscreenViewer').classList.remove('active');
+        document.getElementById('passwordInput').value = '';
+        passwordMessage.style.display = 'none';
+        currentPlayingIndex = 0;
+        if (exitCountdownInterval) clearInterval(exitCountdownInterval);
+      } else {
+        passwordMessage.textContent = '❌ Invalid password';
+        passwordMessage.className = 'message error';
+        passwordMessage.style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+      }
+    });
+
+    document.getElementById('passwordCancelBtn').addEventListener('click', () => {
+      document.getElementById('passwordModal').classList.remove('active');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordMessage').style.display = 'none';
+    });
+
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':');
+      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+    }
+
+    // ======================== Logout ========================
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('instructionData');
+      localStorage.removeItem('fileData');
+      localStorage.removeItem('userLoggedIn');
+      window.location.href = 'login.html';
+    });
+
+    // ======================== Initialize ========================
+    window.addEventListener('load', () => {
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      if (!userLoggedIn) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      createRow(1);
+      rowCount = 1;
+      loadViewerData();
+    });
+  </script>
+</body>
+</html>

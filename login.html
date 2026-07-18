@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --accent: #4f46e5;
+      --accent-2: #7c3aed;
+      --border: #374151;
+      --error: #ef4444;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #1e293b);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .card {
+      width: min(100%, 420px);
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.7rem;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: #e5e7eb;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .toggle {
+      background: transparent;
+      border: 0;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0;
+    }
+
+    button {
+      margin-top: 6px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 4px;
+      font-size: 0.95rem;
+    }
+
+    .message.error { color: var(--error); }
+    .message.success { color: var(--success); }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to continue</p>
+
+    <form id="loginForm" novalidate>
+      <label>
+        Email
+        <input id="email" type="email" placeholder="you@example.com" required />
+      </label>
+
+      <label>
+        Password
+        <input id="password" type="password" placeholder="Enter password" required />
+      </label>
+
+      <div class="row">
+        <span>Demo: demo@example.com / password123</span>
+        <button class="toggle" type="button" id="togglePassword">Show</button>
+      </div>
+
+      <button type="submit">Log in</button>
+      <div id="message" class="message" aria-live="polite"></div>
+    </form>
+
+    <p class="hint">
+      This is a front-end demo. For real applications, authenticate on a server using hashed passwords and secure session handling.
+    </p>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const message = document.getElementById("message");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("click", () => {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      togglePassword.textContent = isPassword ? "Hide" : "Show";
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const email = emailInput.value.trim().toLowerCase();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        message.textContent = "Please enter both email and password.";
+        message.className = "message error";
+        return;
+      }
+
+      if (email === "demo@example.com" && password === "password123") {
+        message.textContent = "Login successful! Redirecting...";
+        message.className = "message success";
+        localStorage.setItem("userLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1500);
+      } else {
+        message.textContent = "Invalid email or password.";
+        message.className = "message error";
+      }
+    });
+  </script>
+</body>
+</html>
